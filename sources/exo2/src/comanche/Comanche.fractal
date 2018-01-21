@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+<!DOCTYPE definition PUBLIC "-//objectweb.org//DTD Fractal ADL 2.0//EN" "classpath://org/objectweb/fractal/adl/xml/basic.dtd">
+
+<definition name="comanche.Comanche">
+  <interface name="r" signature="java.lang.Runnable" role="server"/>
+  <component name="Frontend">
+    <interface name="r" signature="java.lang.Runnable" role="server"/>
+    <interface name="rh" signature="comanche.RequestHandler" role="client"/>
+    <component name="Receiver">
+      <interface name="r" signature="java.lang.Runnable" role="server"/>
+      <interface name="rh" signature="comanche.RequestHandler" role="client"/>
+      <interface name="s" signature="comanche.Scheduler" role="client"/>
+      <content class="comanche.RequestReceiver"/>
+      <controller desc="primitive"/>
+    </component> 
+    <component name="MultiThreadScheduler">
+      <interface name="s" signature="comanche.Scheduler" role="server"/>
+      <content class="comanche.MultiThreadScheduler"/>
+      <controller desc="primitive"/>
+    </component>
+    <binding client="this.r" server="Receiver.r"/>
+    <binding client="Receiver.rh" server="this.rh"/>
+    <binding client="Receiver.s" server="MultiThreadScheduler.s"/>
+    <controller desc="composite"/>
+  </component>
+  <component name="Backend">
+    <interface name="rh" signature="comanche.RequestHandler" role="server"/>
+    <component name="Analyzer">
+      <interface name="a" signature="comanche.RequestHandler" role="server"/>
+      <interface name="l" signature="comanche.Logger" role="client"/>
+      <interface name="rh" signature="comanche.RequestHandler" role="client"/>
+      <content class="comanche.RequestAnalyzer"/>
+      <controller desc="primitive"/>
+    </component>  
+    <component name="Handler">
+      <interface name="rh" signature="comanche.RequestHandler" role="server"/>
+      <component name="Dispatcher">
+	<interface name="rh" signature="comanche.RequestHandler" role="server" />
+	<interface name="h" signature="comanche.RequestHandler" cardinality="collection" role="client"/>
+	<content class="comanche.RequestDispatcher"/>
+	<controller desc="primitive"/>
+      </component>  
+      <component name="FileHandler">
+	<interface name="rh" signature="comanche.RequestHandler" role="server"/>
+	<content class="comanche.FileRequestHandler"/>
+	<controller desc="primitive"/>
+      </component>  
+      <component name="ErrorHandler">
+	<interface name="rh" signature="comanche.RequestHandler" role="server"/>
+	<content class="comanche.ErrorRequestHandler"/>
+	<controller desc="primitive"/>
+      </component>  
+      <binding client="this.rh" server="Dispatcher.rh"/>
+      <binding client="Dispatcher.h0" server="FileHandler.rh"/>
+      <binding client="Dispatcher.h1" server="ErrorHandler.rh"/>
+      <controller desc="composite"/>
+    </component>
+    <component name="Logger">
+      <interface name="l" signature="comanche.Logger" role="server"/>
+      <content class="comanche.BasicLogger"/>
+      <controller desc="primitive"/>
+    </component>
+    <binding client="this.rh" server="Analyzer.a"/>
+    <binding client="Analyzer.l" server="Logger.l"/>
+    <binding client="Analyzer.rh" server="Handler.rh"/>
+    <controller desc="composite"/>
+  </component>
+  <binding client="this.r" server="Frontend.r"/>
+  <binding client="Frontend.rh" server="Backend.rh"/>
+  <controller desc="composite"/>
+</definition>

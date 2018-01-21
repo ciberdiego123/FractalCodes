@@ -1,0 +1,4 @@
+org.objectweb.fractal.api
+org.objectweb.fractal.api.control
+org.objectweb.fractal.api.factory
+org.objectweb.fractal.api.type
