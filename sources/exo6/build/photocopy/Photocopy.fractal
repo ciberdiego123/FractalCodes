@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+<!DOCTYPE definition PUBLIC "-//objectweb.org//DTD Fractal ADL 2.0//EN" "classpath://org/objectweb/fractal/adl/xml/basic.dtd">
+
+<definition name="photocopy.Photocopy">
+  <interface name="r" signature="java.lang.Runnable" role="server"/>
+  
+  <component name="User">
+	  <interface name="c" signature="java.lang.Runnable" role="server"/>
+	  <interface name="commandeImp" signature="photocopy.CommandeImp" role="client"/>
+	  <interface name="commandeNum" signature="photocopy.CommandeNum" role="client"/>
+      <content class="photocopy.UserImpl"/>
+      <controller desc="primitive"/>
+  </component>
+  
+  <component name="Photocopieur">
+	<interface name="commandeImp" signature="photocopy.CommandeImp" role="server"/>
+	<interface name="commandeNum" signature="photocopy.CommandeNum" role="server"/>
+	<interface name="encreNoir" signature="photocopy.EncreNoir" role="client"/>
+	<interface name="encreCouleur" signature="photocopy.EncreCouleur" role="client"/>
+	<interface name="magasinPapier" signature="photocopy.MagasinPapier" role="client"/>
+	<interface name="docOriginal" signature="photocopy.DocOriginal" role="client"/>
+	<interface name="alimentation" signature="photocopy.Alimentation" role="client"/>
+  
+		<component name="Imp">
+			<interface name="commandeImp" signature="photocopy.CommandeImp" role="server"/>
+			<interface name="encreNoir" signature="photocopy.EncreNoir" role="client"/>
+			<interface name="encreCouleur" signature="photocopy.EncreCouleur" role="client"/>
+			<interface name="magasinPapier" signature="photocopy.MagasinPapier" role="client"/>
+			<interface name="docNum" signature="photocopy.DocNum" role="client"/>
+			<content class="photocopy.ImpImpl"/>
+			<controller desc="primitive"/>
+		</component>
+		
+		<component name="Num">
+		    <interface name="docNum" signature="photocopy.DocNum" role="server"/>
+			<interface name="commandeNum" signature="photocopy.CommandeNum" role="server"/>
+			<interface name="docOriginal" signature="photocopy.DocOriginal" role="client"/>
+			<interface name="alimentation" signature="photocopy.Alimentation" role="client"/>
+			<content class="photocopy.NumImpl"/>
+			<controller desc="primitive"/>
+		</component>
+
+		<binding client="this.commandeImp" server="Imp.commandeImp"/>	
+		<binding client="this.commandeNum" server="Num.commandeNum"/>	
+		<binding client="Imp.docNum" server="Num.docNum"/>
+		<binding client="Imp.encreNoir" server="this.encreNoir"/>	
+		<binding client="Imp.encreCouleur" server="this.encreCouleur"/>	
+		<binding client="Imp.magasinPapier" server="this.magasinPapier"/>	
+		<binding client="Num.docOriginal" server="this.docOriginal"/>	
+		<binding client="Num.alimentation" server="this.alimentation"/>	
+		<controller desc="composite"/>
+  </component>
+   
+  <component name="Environnement">
+    <interface name="encreNoir" signature="photocopy.EncreNoir" role="server"/>
+	<interface name="encreCouleur" signature="photocopy.EncreCouleur" role="server"/>
+    <interface name="magasinPapier" signature="photocopy.MagasinPapier" role="server"/>
+	<interface name="docOriginal" signature="photocopy.DocOriginal" role="server"/>
+	<interface name="alimentation" signature="photocopy.Alimentation" role="server"/>
+    
+	  <component name="Cart">
+		  <interface name="encreNoir" signature="photocopy.EncreNoir" role="server"/>
+		  <interface name="encreCouleur" signature="photocopy.EncreCouleur" role="server"/>
+		  <content class="photocopy.CartImpl"/>
+		  <controller desc="primitive"/>
+	  </component>
+	  
+	  <component name="Input">
+		  <interface name="magasinPapier" signature="photocopy.MagasinPapier" role="server"/>
+		  <content class="photocopy.InputImpl"/>
+		  <controller desc="primitive"/>
+	  </component>
+	  
+	  <component name="Doc">
+		  <interface name="docOriginal" signature="photocopy.DocOriginal" role="server"/>
+		  <content class="photocopy.DocImpl"/>
+		  <controller desc="primitive"/>
+	  </component>
+	  
+	  <component name="Alim">
+		  <interface name="alimentation" signature="photocopy.Alimentation" role="server"/>
+		  <content class="photocopy.AlimImpl"/>
+		  <controller desc="primitive"/>
+	  </component>
+	  
+	<binding client="this.encreNoir" server="Cart.encreNoir"/>
+	<binding client="this.encreCouleur" server="Cart.encreCouleur"/>
+	<binding client="this.magasinPapier" server="Input.magasinPapier"/>
+	<binding client="this.docOriginal" server="Doc.docOriginal"/>
+	<binding client="this.alimentation" server="Alim.alimentation"/>
+    <controller desc="composite"/>
+  
+  </component>
+  
+  <binding client="this.r" server="User.c"/>
+  <binding client="User.commandeImp" server="Photocopieur.commandeImp"/>
+  <binding client="User.commandeNum" server="Photocopieur.commandeNum"/>
+  <binding client="Photocopieur.encreNoir" server="Environnement.encreNoir"/>
+  <binding client="Photocopieur.encreCouleur" server="Environnement.encreCouleur"/>
+  <binding client="Photocopieur.magasinPapier" server="Environnement.magasinPapier"/>
+  <binding client="Photocopieur.docOriginal" server="Environnement.docOriginal"/>
+  <binding client="Photocopieur.alimentation" server="Environnement.alimentation"/>
+  <controller desc="composite"/>
+</definition>
